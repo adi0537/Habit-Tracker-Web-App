@@ -1,3 +1,4 @@
+// StatisticsBoard.jsx
 import React from "react";
 
 function StatisticsDashboard({ habits, completions }) {
@@ -5,7 +6,7 @@ function StatisticsDashboard({ habits, completions }) {
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
 
-  const totalHabits = habits.length;
+  const totalHabits = Array.isArray(habits) ? habits.length : 0;
   const activeHabits = habits.filter(h => (completions[h.id] || []).length > 0).length;
 
   // -----------------------------
@@ -77,6 +78,7 @@ function StatisticsDashboard({ habits, completions }) {
 
   // -----------------------------
   // MONTHLY COMPLETION RATE (count normalized days)
+  // -- (kept intact per your request)
   // -----------------------------
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const monthlyCompletions = [];
@@ -90,6 +92,30 @@ function StatisticsDashboard({ habits, completions }) {
 
   const avgMonthly = monthlyCompletions.reduce((s, c) => s + c, 0) / daysInMonth;
   const monthlyRate = totalHabits ? Math.round((avgMonthly / totalHabits) * 100) : 0;
+
+  // -----------------------------
+  // LAST 14-DAY COMPLETION RATE (rolling window ending today)
+  // -----------------------------
+  const DAYS_WINDOW = 14;
+  const last14Dates = [];
+  const last14Completions = [];
+
+  // Build array of the last 14 local day keys (oldest -> newest)
+  for (let i = DAYS_WINDOW - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i); // local arithmetic
+    last14Dates.push(toLocalDateKey(d));
+  }
+
+  // Count completed habits for each of those days
+  for (const dateKey of last14Dates) {
+    const completedCount = habits.filter(h => (completionSets[h.id] || new Set()).has(dateKey)).length;
+    last14Completions.push(completedCount);
+  }
+
+  // Average across the window (equal-weight per day)
+  const avgLast14 = last14Completions.reduce((s, c) => s + c, 0) / DAYS_WINDOW;
+  const last14Rate = totalHabits ? Math.round((avgLast14 / totalHabits) * 100) : 0;
 
   // -----------------------------
   // TOP HABITS (Improved)
@@ -184,16 +210,20 @@ function StatisticsDashboard({ habits, completions }) {
         </div>
       </div>
 
-      {/* MONTHLY CHART */}
+      {/* LAST 14-DAY CHART (rolling window) */}
       <div>
-        <h3 className="text-lg font-semibold text-slate-200 mb-3">📈 Monthly Progress</h3>
+        <h3 className="text-lg font-semibold text-slate-200 mb-3">📈 Recent Progress (last 14 days)</h3>
 
         <div className="glass neon-border p-4">
           <div className="flex items-end space-x-1 h-20">
 
-            {monthlyCompletions.slice(-14).map((c, idx, arr) => {
+            {last14Completions.map((c, idx, arr) => {
               const height = totalHabits ? (c / totalHabits) * 100 : 0;
               const isToday = idx === arr.length - 1;
+
+              // local day number label for that specific date
+              const dateKey = last14Dates[idx] || '';
+              const dayNumber = dateKey ? Number(dateKey.split('-')[2]) : '';
 
               return (
                 <div key={idx} className="flex-1 flex flex-col items-center">
@@ -206,11 +236,8 @@ function StatisticsDashboard({ habits, completions }) {
                     style={{ height: `${Math.max(height, 6)}%` }}
                   />
 
-                  <div className={`text-xs mt-1 ${
-                    isToday ? "text-emerald-300" : "text-slate-500"
-                  }`}>
-                    {/* label day number for last 14 days — we keep your original approach */}
-                    {new Date(Date.UTC(currentYear, currentMonth, idx + (daysInMonth - 13))).getUTCDate()}
+                  <div className={`text-xs mt-1 ${isToday ? "text-emerald-300" : "text-slate-500"}`}>
+                    {dayNumber}
                   </div>
                 </div>
               );
@@ -219,7 +246,7 @@ function StatisticsDashboard({ habits, completions }) {
           </div>
 
           <div className="text-center text-sm text-slate-400 mt-2">
-            Last 14 days • {monthlyRate}% average completion rate
+            Last 14 days • {last14Rate}% average completion rate
           </div>
         </div>
       </div>
