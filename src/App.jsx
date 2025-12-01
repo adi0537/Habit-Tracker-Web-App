@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import useLocalStorage from './hooks/useLocalStorage';
+import { useState, useEffect } from 'react';
+import useApi from './hooks/useApi';
 import AddHabitForm from './components/AddHabitForm';
 import HabitList from './components/HabitList';
 import ProgressBar from './components/ProgressBar';
@@ -8,8 +8,14 @@ import StatisticsDashboard from './components/StatisticsDashboard';
 import DataExport from './components/DataExport';
 
 function App() {
-  const [habits, setHabits] = useLocalStorage('habits', []);
-  const [completions, setCompletions] = useLocalStorage('completions', {});
+  // FORCE DARK MODE ONCE
+  useEffect(() => {
+    document.body.classList.add("dark");
+  }, []);
+
+  const [habits, setHabits] = useApi('habits', []);
+  const [completions, setCompletions] = useApi('completions', {});
+
   const [activeTab, setActiveTab] = useState('habits');
 
   const today = new Date().toISOString().split('T')[0];
@@ -39,6 +45,7 @@ function App() {
   const toggleComplete = (id) => {
     const habitCompletions = completions[id] || [];
     const isCompleted = habitCompletions.includes(today);
+
     if (isCompleted) {
       setCompletions({
         ...completions,
@@ -52,7 +59,9 @@ function App() {
     }
   };
 
-  const completedToday = habits.filter(habit => (completions[habit.id] || []).includes(today)).length;
+  const completedToday = habits.filter(habit =>
+    (completions[habit.id] || []).includes(today)
+  ).length;
 
   const getMotivationalMessage = () => {
     const percentage = habits.length > 0 ? Math.round((completedToday / habits.length) * 100) : 0;
@@ -71,27 +80,28 @@ function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8">
+    <div className="min-h-screen bg-slate-900 py-8 text-slate-200">
       <div className="container mx-auto px-4 max-w-4xl">
+
+        {/* Title */}
         <div className="text-center mb-8 animate-fade-in-up">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-            🌟 Habit Tracker
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-purple-400 bg-clip-text text-transparent mb-2">
+            🌟 HabitFlow
           </h1>
-          <p className="text-gray-600 text-lg">{getMotivationalMessage()}</p>
+          <p className="text-slate-300 text-lg">{getMotivationalMessage()}</p>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="mb-6 bg-white rounded-xl shadow-lg p-2 border border-gray-100">
+        {/* TABS */}
+        <div className="glass neon-border rounded-xl p-2 mb-6">
           <div className="flex space-x-1">
-            {tabs.map((tab) => (
+            {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md transform scale-105'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${activeTab === tab.id
+                    ? "bg-gradient-to-r from-sky-500 to-purple-600 text-white shadow-md scale-105"
+                    : "text-slate-300 hover:bg-slate-700/40"
+                  }`}
               >
                 <span className="mr-2">{tab.icon}</span>
                 {tab.label}
@@ -100,8 +110,8 @@ function App() {
           </div>
         </div>
 
-        {/* Tab Content */}
-        <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        {/* MAIN CONTENT */}
+        <div className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
           {activeTab === 'habits' && (
             <>
               <AddHabitForm onAddHabit={addHabit} />
@@ -117,7 +127,7 @@ function App() {
           )}
 
           {activeTab === 'calendar' && (
-            <CalendarView completions={completions} habits={habits} />
+            <CalendarView habits={habits} completions={completions} />
           )}
 
           {activeTab === 'statistics' && (
@@ -129,11 +139,14 @@ function App() {
           )}
         </div>
 
+        {/* Empty State */}
         {habits.length === 0 && activeTab === 'habits' && (
           <div className="text-center mt-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             <div className="text-6xl mb-4 animate-pulse-gentle">🎯</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">Ready to build better habits?</h3>
-            <p className="text-gray-500">Start by adding your first habit above!</p>
+            <h3 className="text-xl font-semibold text-slate-200 mb-2">
+              Ready to build better habits?
+            </h3>
+            <p className="text-slate-400">Start by adding your first habit above!</p>
           </div>
         )}
       </div>
@@ -142,11 +155,7 @@ function App() {
 }
 
 function getRandomColor() {
-  const colors = [
-    'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500',
-    'bg-indigo-500', 'bg-red-500', 'bg-yellow-500', 'bg-teal-500'
-  ];
-  return colors[Math.floor(Math.random() * colors.length)];
+  return 'bg-sky-500';
 }
 
 function getRandomIcon() {

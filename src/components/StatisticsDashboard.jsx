@@ -1,141 +1,225 @@
+import React from "react";
+
 function StatisticsDashboard({ habits, completions }) {
   const today = new Date();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
 
-  // Calculate statistics
   const totalHabits = habits.length;
-  const activeHabits = habits.filter(habit => {
-    const habitCompletions = completions[habit.id] || [];
-    return habitCompletions.length > 0;
-  }).length;
+  const activeHabits = habits.filter(h => (completions[h.id] || []).length > 0).length;
 
-  // Current streaks
+  // -----------------------------
+  // Helper: normalize to local YYYY-MM-DD (avoid timezone shifts)
+  // -----------------------------
+  function toLocalDateKey(dateLike) {
+    if (!dateLike && dateLike !== 0) return null;
+    // If it's already yyyy-mm-dd, return it
+    if (typeof dateLike === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateLike)) return dateLike;
+    const d = (dateLike instanceof Date) ? new Date(dateLike) : new Date(dateLike);
+    if (isNaN(d.getTime())) return null;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function buildDateSet(arr = [], accessor) {
+    const set = new Set();
+    for (const item of arr) {
+      let raw = item;
+      if (typeof accessor === 'function') raw = accessor(item);
+      // If item is an object with common fields:
+      if (raw && typeof raw === 'object') {
+        raw = raw.date ?? raw.createdAt ?? raw.timestamp ?? JSON.stringify(raw);
+      }
+      const key = toLocalDateKey(raw);
+      if (key) set.add(key);
+    }
+    return set;
+  }
+
+  // Precompute per-habit date sets for fast lookups
+  const completionSets = {};
+  for (const h of habits) {
+    completionSets[h.id] = buildDateSet(completions[h.id] || [], (it) => {
+      // If completion entries are objects, pick common fields:
+      if (it && typeof it === 'object') return it.date ?? it.completedAt ?? it.timestamp ?? it;
+      return it;
+    });
+  }
+
+  // -----------------------------
+  // STREAKS (use local-day keys)
+  // -----------------------------
+  const todayKey = toLocalDateKey(today);
+
   const currentStreaks = habits.map(habit => {
-    const habitCompletions = completions[habit.id] || [];
-    if (!habitCompletions.includes(today.toISOString().split('T')[0])) return 0;
+    const set = completionSets[habit.id] || new Set();
+    if (set.size === 0) return 0;
 
+    // --- Minimal change: start counting from YESTERDAY (day before today) ---
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
     let streak = 0;
-    let date = new Date(today);
-    while (habitCompletions.includes(date.toISOString().split('T')[0])) {
-      streak++;
-      date.setDate(date.getDate() - 1);
+    while (true) {
+      const key = toLocalDateKey(d);
+      if (set.has(key)) {
+        streak += 1;
+        d.setDate(d.getDate() - 1); // previous day
+      } else {
+        break;
+      }
     }
     return streak;
   });
 
-  const longestCurrentStreak = Math.max(...currentStreaks, 0);
-  const totalCurrentStreaks = currentStreaks.reduce((sum, streak) => sum + streak, 0);
+  const longestCurrentStreak = currentStreaks.length ? Math.max(...currentStreaks) : 0;
 
-  // Monthly completion rate
+  // -----------------------------
+  // MONTHLY COMPLETION RATE (count normalized days)
+  // -----------------------------
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const monthlyCompletions = [];
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const date = new Date(currentYear, currentMonth, day);
-    const dateStr = date.toISOString().split('T')[0];
-    const completed = habits.filter(habit =>
-      (completions[habit.id] || []).includes(dateStr)
-    ).length;
+  // For each day of this month, build the YYYY-MM-DD (use local construction so local day matches)
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateKey = toLocalDateKey(new Date(currentYear, currentMonth, d)); // local day
+    const completed = habits.filter(h => (completionSets[h.id] || new Set()).has(dateKey)).length;
     monthlyCompletions.push(completed);
   }
 
-  const avgMonthlyCompletion = monthlyCompletions.reduce((sum, comp) => sum + comp, 0) / daysInMonth;
-  const monthlyCompletionRate = totalHabits > 0 ? Math.round((avgMonthlyCompletion / totalHabits) * 100) : 0;
+  const avgMonthly = monthlyCompletions.reduce((s, c) => s + c, 0) / daysInMonth;
+  const monthlyRate = totalHabits ? Math.round((avgMonthly / totalHabits) * 100) : 0;
 
-  // Best performing habits
-  const habitStats = habits.map(habit => {
-    const habitCompletions = completions[habit.id] || [];
-    const completionRate = habitCompletions.length > 0 ?
-      Math.round((habitCompletions.length / Math.max(1, (new Date() - new Date(habit.createdAt)) / (1000 * 60 * 60 * 24))) * 100) : 0;
+  // -----------------------------
+  // TOP HABITS (Improved)
+  // -----------------------------
+  function daysBetween(start, end) {
+    const s = new Date(start), e = new Date(end);
+    s.setHours(0,0,0,0); e.setHours(0,0,0,0);
+    return Math.floor((e - s) / (1000 * 60 * 60 * 24)) + 1;
+  }
+
+  const habitStats = habits.map(h => {
+    const raw = completions[h.id] || [];
+
+    const uniqueDays = [...new Set(raw.map(r => {
+      // Use same accessor as above
+      const val = (r && typeof r === 'object') ? (r.date ?? r.completedAt ?? r.timestamp ?? r) : r;
+      return toLocalDateKey(val);
+    }).filter(Boolean))];
+
+    const created = h.createdAt ? new Date(h.createdAt) : today;
+    const daysAlive = Math.max(1, daysBetween(created, today));
+
+    const expected = daysAlive * (h.frequencyPerDay ?? 1);
+    const percent = Math.min(100, Math.round((uniqueDays.length / expected) * 100));
 
     return {
-      ...habit,
-      completionCount: habitCompletions.length,
-      completionRate
+      ...h,
+      completionCount: uniqueDays.length,
+      completionRate: percent,
     };
   }).sort((a, b) => b.completionRate - a.completionRate);
 
   const topHabits = habitStats.slice(0, 3);
 
+  // -----------------------------
+  // UI — DARK GLASS THEME
+  // -----------------------------
   return (
-    <div className="mb-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
+    <div className="glass neon-border p-6 shadow-xl animate-fade-in-up text-slate-100">
       <div className="flex items-center mb-6">
         <div className="text-2xl mr-3">📊</div>
-        <h2 className="text-2xl font-semibold text-gray-800">Statistics Dashboard</h2>
+        <h2 className="text-2xl font-semibold text-slate-200">Statistics Dashboard</h2>
       </div>
 
-      {/* Key Metrics */}
+      {/* METRICS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
-          <div className="text-2xl font-bold text-blue-600">{totalHabits}</div>
-          <div className="text-sm text-blue-800">Total Habits</div>
+
+        <div className="glass neon-border p-4 text-center text-slate-100">
+          <div className="text-3xl font-bold text-sky-300">{totalHabits}</div>
+          <div className="text-sm text-slate-300">Total Habits</div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-          <div className="text-2xl font-bold text-green-600">{activeHabits}</div>
-          <div className="text-sm text-green-800">Active Habits</div>
+        <div className="glass neon-border p-4 text-center text-slate-100">
+          <div className="text-3xl font-bold text-emerald-300">{activeHabits}</div>
+          <div className="text-sm text-slate-300">Active Habits</div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
-          <div className="text-2xl font-bold text-orange-600">{longestCurrentStreak}</div>
-          <div className="text-sm text-orange-800">Longest Streak</div>
+        <div className="glass neon-border p-4 text-center text-slate-100">
+          <div className="text-3xl font-bold text-orange-300">{longestCurrentStreak}</div>
+          <div className="text-sm text-slate-300">Longest Streak</div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
-          <div className="text-2xl font-bold text-purple-600">{monthlyCompletionRate}%</div>
-          <div className="text-sm text-purple-800">Monthly Avg</div>
+        <div className="glass neon-border p-4 text-center text-slate-100">
+          <div className="text-3xl font-bold text-purple-300">{monthlyRate}%</div>
+          <div className="text-sm text-slate-300">Monthly Avg</div>
         </div>
       </div>
 
-      {/* Top Performing Habits */}
+      {/* TOP HABITS */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">🏆 Top Performing Habits</h3>
+        <h3 className="text-lg font-semibold text-slate-200 mb-3">🏆 Top Performing Habits</h3>
+
         <div className="space-y-3">
-          {topHabits.map((habit, index) => (
-            <div key={habit.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          {topHabits.map((h) => (
+            <div key={h.id}
+              className="glass neon-border p-3 flex items-center justify-between hover:scale-[1.02] transition">
+
               <div className="flex items-center">
-                <div className="text-lg mr-3">{habit.icon || '🎯'}</div>
+                <div className="text-xl mr-3">{h.icon || "🔥"}</div>
                 <div>
-                  <div className="font-medium text-gray-800">{habit.name}</div>
-                  <div className="text-sm text-gray-600">{habit.completionCount} completions</div>
+                  <div className="font-medium text-slate-200">{h.name}</div>
+                  <div className="text-sm text-slate-400">{h.completionCount} completions</div>
                 </div>
               </div>
+
               <div className="text-right">
-                <div className="text-lg font-bold text-green-600">{habit.completionRate}%</div>
-                <div className="text-xs text-gray-500">completion rate</div>
+                <div className="text-lg font-bold text-emerald-300">{h.completionRate}%</div>
+                <div className="text-xs text-slate-500">completion rate</div>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Monthly Progress Chart */}
+      {/* MONTHLY CHART */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">📈 Monthly Progress</h3>
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <h3 className="text-lg font-semibold text-slate-200 mb-3">📈 Monthly Progress</h3>
+
+        <div className="glass neon-border p-4">
           <div className="flex items-end space-x-1 h-20">
-            {monthlyCompletions.slice(-14).map((completed, index) => {
-              const height = totalHabits > 0 ? (completed / totalHabits) * 100 : 0;
-              const isToday = index === monthlyCompletions.slice(-14).length - 1;
+
+            {monthlyCompletions.slice(-14).map((c, idx, arr) => {
+              const height = totalHabits ? (c / totalHabits) * 100 : 0;
+              const isToday = idx === arr.length - 1;
 
               return (
-                <div key={index} className="flex-1 flex flex-col items-center">
+                <div key={idx} className="flex-1 flex flex-col items-center">
                   <div
-                    className={`w-full bg-gradient-to-t from-blue-400 to-blue-600 rounded-t transition-all duration-500 ${
-                      isToday ? 'from-green-400 to-green-600' : ''
+                    className={`w-full rounded-t transition-all duration-500 ${
+                      isToday
+                        ? "bg-gradient-to-t from-emerald-400 to-sky-400"
+                        : "bg-gradient-to-t from-sky-700 to-sky-400"
                     }`}
-                    style={{ height: `${Math.max(height, 5)}%` }}
+                    style={{ height: `${Math.max(height, 6)}%` }}
                   />
-                  <div className={`text-xs mt-1 ${isToday ? 'font-bold text-green-600' : 'text-gray-500'}`}>
-                    {new Date(currentYear, currentMonth, index + (daysInMonth - 13)).getDate()}
+
+                  <div className={`text-xs mt-1 ${
+                    isToday ? "text-emerald-300" : "text-slate-500"
+                  }`}>
+                    {/* label day number for last 14 days — we keep your original approach */}
+                    {new Date(Date.UTC(currentYear, currentMonth, idx + (daysInMonth - 13))).getUTCDate()}
                   </div>
                 </div>
               );
             })}
+
           </div>
-          <div className="text-center text-sm text-gray-600 mt-2">
-            Last 14 days • {monthlyCompletionRate}% average completion rate
+
+          <div className="text-center text-sm text-slate-400 mt-2">
+            Last 14 days • {monthlyRate}% average completion rate
           </div>
         </div>
       </div>

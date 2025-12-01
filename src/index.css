@@ -1,23 +1,83 @@
 @import "tailwindcss";
 
+/* ---------------------------
+   Base Global Dark Theme
+---------------------------- */
+
+html, body {
+  background: #0f172a; /* slate-900 */
+  color: #e2e8f0;       /* slate-200 */
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Smooth transitions */
+* {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+/* ---------------------------
+   Frosted Glass Utility
+---------------------------- */
+
+.glass {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 1rem;
+}
+
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.20);
+}
+
+/* Neon Accent Border */
+.neon-border {
+  border: 1px solid rgba(56, 189, 248, 0.4); /* sky-400 glow */
+  box-shadow:
+    0 0 6px rgba(56, 189, 248, 0.4),
+    0 0 20px rgba(129, 140, 248, 0.3);
+}
+
+/* ---------------------------
+   Custom Scrollbars (Dark)
+---------------------------- */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020617; /* slate-950 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155; /* slate-700 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #475569; /* slate-600 */
+}
+
+/* ---------------------------
+   Keyframes (from your file)
+---------------------------- */
+
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }
 
 @keyframes celebrate {
@@ -28,32 +88,30 @@
   100% { transform: scale(1) rotate(0deg); }
 }
 
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out;
+.animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+.animate-pulse-gentle { animation: pulse 2s infinite; }
+.animate-celebrate { animation: celebrate 0.8s ease-in-out; }
+
+/* RESET OLD LIGHT COLORS TO DARK THEME COLORS */
+.text-gray-800, .text-black {
+  color: #f1f5f9 !important; /* slate-100 */
 }
 
-.animate-pulse-gentle {
-  animation: pulse 2s infinite;
+.text-gray-700 {
+  color: #e2e8f0 !important; /* slate-200 */
 }
 
-.animate-celebrate {
-  animation: celebrate 0.8s ease-in-out;
+.text-gray-600 {
+  color: #cbd5e1 !important; /* slate-300 */
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
+.bg-white, .bg-gray-50, .bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
+.border-gray-100 {
+  border-color: rgba(255,255,255,0.18) !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}

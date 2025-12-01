@@ -1,27 +1,47 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 function CalendarView({ completions, habits }) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
+  const localDateKey = (date = new Date()) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
+
+  const normalizeDateString = (s) => {
+    if (!s && s !== 0) return s;
+    if (s instanceof Date) return localDateKey(s);
+    if (typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    const d = new Date(s);
+    return Number.isNaN(d.getTime()) ? null : localDateKey(d);
+  };
+
+  const completionSets = useMemo(() => {
+    const map = {};
+    for (const id of Object.keys(completions || {})) {
+      map[id] = new Set(
+        (completions[id] || [])
+          .map(normalizeDateString)
+          .filter((v) => typeof v === 'string')
+      );
+    }
+    return map;
+  }, [completions]);
+
   const getDaysInMonth = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const daysInMonth = lastDay.getDate();
-    const startingDayOfWeek = firstDay.getDay();
+    const y = date.getFullYear();
+    const m = date.getMonth();
+
+    const firstDay = new Date(y, m, 1);
+    const lastDay = new Date(y, m + 1, 0);
 
     const days = [];
 
-    // Add empty cells for days before the first day of the month
-    for (let i = 0; i < startingDayOfWeek; i++) {
-      days.push(null);
-    }
-
-    // Add days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-      days.push(new Date(year, month, day));
-    }
+    for (let i = 0; i < firstDay.getDay(); i++) days.push(null);
+    for (let day = 1; day <= lastDay.getDate(); day++)
+      days.push(new Date(y, m, day));
 
     return days;
   };
@@ -29,104 +49,123 @@ function CalendarView({ completions, habits }) {
   const getCompletionStatus = (date) => {
     if (!date) return null;
 
-    const dateStr = date.toISOString().split('T')[0];
-    const totalHabits = habits.length;
-    const completedHabits = habits.filter(habit =>
-      (completions[habit.id] || []).includes(dateStr)
-    ).length;
+    const key = localDateKey(date);
+    const total = habits.length;
 
-    if (completedHabits === 0) return 'none';
-    if (completedHabits === totalHabits) return 'full';
+    let completed = 0;
+    for (const h of habits) {
+      if ((completionSets[h.id] || new Set()).has(key)) completed++;
+    }
+
+    if (completed === 0) return 'none';
+    if (completed === total) return 'full';
     return 'partial';
   };
 
-  const navigateMonth = (direction) => {
-    setCurrentDate(prevDate => {
-      const newDate = new Date(prevDate);
-      newDate.setMonth(newDate.getMonth() + direction);
-      return newDate;
+  const navigateMonth = (dir) => {
+    setCurrentDate((prev) => {
+      const d = new Date(prev);
+      d.setMonth(d.getMonth() + dir);
+      return d;
     });
   };
 
-  const goToToday = () => {
-    setCurrentDate(new Date());
-  };
+  const goToToday = () => setCurrentDate(new Date());
 
   const days = getDaysInMonth(currentDate);
+
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January','February','March','April','May','June',
+    'July','August','September','October','November','December'
   ];
 
   return (
-    <div className="mb-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
+    <div className="mb-6 p-6 glass neon-border shadow-xl text-slate-100">
+      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
           <div className="text-2xl mr-3">📅</div>
-          <h2 className="text-2xl font-semibold text-gray-800">Calendar View</h2>
+          <h2 className="text-2xl font-semibold text-slate-200">Calendar View</h2>
         </div>
+
         <div className="flex items-center space-x-2">
           <button
             onClick={() => navigateMonth(-1)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className="p-2 rounded-lg hover:bg-slate-700/40 text-slate-300"
           >
             ←
           </button>
+
           <button
             onClick={goToToday}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 text-sm"
+            className="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm"
           >
             Today
           </button>
+
           <button
             onClick={() => navigateMonth(1)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            className="p-2 rounded-lg hover:bg-slate-700/40 text-slate-300"
           >
             →
           </button>
         </div>
       </div>
 
+      {/* Month Title */}
       <div className="mb-4 text-center">
-        <h3 className="text-xl font-semibold text-gray-700">
+        <h3 className="text-xl font-semibold text-slate-200">
           {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
         </h3>
       </div>
 
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-1 mb-4">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="p-2 text-center text-sm font-medium text-gray-500">
-            {day}
+      {/* Day Names */}
+      <div className="grid grid-cols-7 gap-1 mb-2">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+          <div key={d} className="p-2 text-center text-sm font-medium text-slate-400">
+            {d}
           </div>
         ))}
+      </div>
 
-        {days.map((date, index) => {
+      {/* Calendar Grid */}
+      <div className="grid grid-cols-7 gap-1">
+        {days.map((date, idx) => {
           const status = getCompletionStatus(date);
-          const isToday = date && date.toDateString() === new Date().toDateString();
+          const isToday =
+            date && date.toDateString() === new Date().toDateString();
 
           return (
             <div
-              key={index}
-              className={`aspect-square p-1 flex items-center justify-center text-sm relative ${
-                date ? 'cursor-pointer hover:bg-gray-50' : ''
+              key={idx}
+              className={`aspect-square flex items-center justify-center rounded-lg relative ${
+                date ? "hover:bg-slate-700/40 cursor-pointer" : ""
               }`}
             >
               {date && (
                 <>
-                  <span className={`font-medium ${isToday ? 'text-blue-600 font-bold' : 'text-gray-700'}`}>
+                  <span
+                    className={`font-medium ${
+                      isToday ? "text-sky-400" : "text-slate-200"
+                    }`}
+                  >
                     {date.getDate()}
                   </span>
+
                   {status && (
                     <div
                       className={`absolute bottom-1 right-1 w-2 h-2 rounded-full ${
-                        status === 'full' ? 'bg-green-500' :
-                        status === 'partial' ? 'bg-yellow-500' : 'bg-gray-300'
+                        status === "full"
+                          ? "bg-emerald-400"
+                          : status === "partial"
+                            ? "bg-yellow-400"
+                            : "bg-slate-600"
                       }`}
                     />
                   )}
+
                   {isToday && (
-                    <div className="absolute inset-0 border-2 border-blue-500 rounded-lg" />
+                    <div className="absolute inset-0 border-2 border-sky-400 rounded-lg"></div>
                   )}
                 </>
               )}
@@ -136,20 +175,21 @@ function CalendarView({ completions, habits }) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center space-x-6 text-sm">
+      <div className="flex items-center justify-center space-x-6 text-sm mt-4 text-slate-300">
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+          <div className="w-3 h-3 bg-emerald-400 rounded-full mr-2"></div>
           <span>All habits completed</span>
         </div>
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+          <div className="w-3 h-3 bg-yellow-400 rounded-full mr-2"></div>
           <span>Some habits completed</span>
         </div>
         <div className="flex items-center">
-          <div className="w-3 h-3 bg-gray-300 rounded-full mr-2"></div>
+          <div className="w-3 h-3 bg-slate-600 rounded-full mr-2"></div>
           <span>No habits completed</span>
         </div>
       </div>
+
     </div>
   );
 }
