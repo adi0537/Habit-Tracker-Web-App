@@ -5,5 +5,5 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/Habit-Tracker-Web-App/',
+  base: '/',   // <<-- FIXED: ensures assets load correctly on Vercel
 })
