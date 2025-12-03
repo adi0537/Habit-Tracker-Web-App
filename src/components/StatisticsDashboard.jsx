@@ -232,10 +232,10 @@ function StatisticsDashboard({ habits, completions, theme = 'light' }) {
           theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
         }`}>📈 Recent Progress (last 14 days)</h3>
 
-        <div className={`glass neon-border p-4 ${
+        <div className={`glass neon-border p-4 overflow-x-auto ${
           theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
         }`}>
-          <div className="flex items-end space-x-1 h-20">
+          <div className="flex items-end gap-2 h-24">
 
             {last14Completions.map((c, idx, arr) => {
               const height = totalHabits ? (c / totalHabits) * 100 : 0;
@@ -246,7 +246,7 @@ function StatisticsDashboard({ habits, completions, theme = 'light' }) {
               const dayNumber = dateKey ? Number(dateKey.split('-')[2]) : '';
 
               return (
-                <div key={idx} className="flex-1 flex flex-col items-center">
+                <div key={idx} className="flex flex-col items-center flex-1 gap-1">
                   <div
                     className={`w-full rounded-t transition-all duration-500 ${
                       isToday
@@ -256,7 +256,7 @@ function StatisticsDashboard({ habits, completions, theme = 'light' }) {
                     style={{ height: `${Math.max(height, 6)}%` }}
                   />
 
-                  <div className={`text-base font-bold mt-2 px-3 py-2 rounded-md w-12 h-12 flex items-center justify-center ${isToday ? "bg-emerald-400/30 text-emerald-400" : theme === 'dark' ? "bg-slate-700 text-slate-200" : "bg-slate-200 text-slate-900"}`}>
+                  <div className={`text-xs sm:text-sm font-bold px-1 py-1 rounded-md w-full flex items-center justify-center flex-shrink-0 ${isToday ? "bg-emerald-400/30 text-emerald-400" : theme === 'dark' ? "bg-slate-700 text-slate-200" : "bg-slate-200 text-slate-900"}`}>
                     {dayNumber}
                   </div>
                 </div>
@@ -265,7 +265,7 @@ function StatisticsDashboard({ habits, completions, theme = 'light' }) {
 
           </div>
 
-          <div className={`text-center text-base font-semibold mt-3 ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>
+          <div className={`text-center text-sm sm:text-base font-semibold mt-3 overflow-x-auto ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>
             Last 14 days • <span className="text-lg font-bold text-cyan-400">{last14Rate}%</span> average completion rate
           </div>
         </div>

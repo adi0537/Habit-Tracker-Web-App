@@ -150,12 +150,12 @@ function App() {
         <div className={`glass neon-border rounded-xl p-2 mb-6 ${
           theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'
         }`}>
-          <div className="flex space-x-1">
+          <div className="flex gap-2">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${
+                className={`flex-1 py-3 px-2 sm:px-4 rounded-lg font-medium transition text-xs sm:text-sm md:text-base whitespace-nowrap flex items-center justify-center gap-1 ${
                   activeTab === tab.id
                     ? 'bg-gradient-to-r from-teal-300 via-teal-600 to-sky-600 text-white shadow-md scale-105'
                     : theme === 'dark'
@@ -163,8 +163,8 @@ function App() {
                       : 'text-slate-600 hover:bg-slate-200/60'
                 }`}
               >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.label}
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
               </button>
             ))}
           </div>

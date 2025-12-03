@@ -53,10 +53,10 @@ function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, 
             placeholder="Description"
           />
 
-          <div className="flex space-x-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="submit"
-              className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-lg transition w-full sm:w-auto"
             >
               ✓ Save
             </button>
@@ -64,7 +64,7 @@ function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, 
             <button
               type="button"
               onClick={handleEditCancel}
-              className="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-lg transition"
+              className="bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-lg transition w-full sm:w-auto"
             >
               ✕ Cancel
             </button>
@@ -72,9 +72,9 @@ function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, 
         </form>
       ) : (
         <>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {/* Left side */}
-            <div className="flex items-center flex-1">
+            <div className="flex items-center flex-1 min-w-0">
               {/* Completion button */}
               <button
                 onClick={() => onToggleComplete(habit.id)}
@@ -125,19 +125,23 @@ function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, 
             </div>
 
             {/* Buttons */}
-            <div className="flex space-x-2">
+            <div className="flex gap-2 flex-shrink-0 w-full sm:w-auto">
               <button
                 onClick={() => setIsEditing(true)}
-                className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition"
+                className="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition flex-1 sm:flex-none"
+                title="Edit habit"
               >
-                ✏️ Edit
+                <span className="hidden sm:inline">✏️ Edit</span>
+                <span className="sm:hidden">✏️</span>
               </button>
 
               <button
                 onClick={() => onDelete(habit.id)}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition"
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition flex-1 sm:flex-none"
+                title="Delete habit"
               >
-                🗑️ Delete
+                <span className="hidden sm:inline">🗑️ Delete</span>
+                <span className="sm:hidden">🗑️</span>
               </button>
             </div>
           </div>
