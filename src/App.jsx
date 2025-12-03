@@ -36,8 +36,11 @@ function App() {
 
   useEffect(() => {
     const root = document.documentElement;
+    // Toggle tailwind dark class if used
     if (theme === 'dark') root.classList.add('dark');
     else root.classList.remove('dark');
+    // Set data-theme for CSS variables
+    root.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
 
@@ -122,7 +125,7 @@ function App() {
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
 
   return (
-    <div className={`min-h-screen py-2 ${theme === 'dark' ? 'bg-slate-900 text-slate-200' : 'bg-slate-50 text-slate-900'}`}>
+    <div className={`min-h-screen py-2`}>
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Theme toggle - first div */}
         <div className="flex justify-end mb-2 animate-fade-in-up">

@@ -12,6 +12,28 @@
   --border: #e2e8f0; /* light: slate-200 */
 }
 
+/* Global theme variables for text color */
+:root {
+  --text-color: #0f172a; /* slate-900 */
+  --muted-text-color: #475569; /* slate-600 */
+  --bg-color: #f8fafc; /* slate-50 */
+}
+
+[data-theme="dark"] {
+  --text-color: #e5e7eb; /* slate-200 */
+  --muted-text-color: #cbd5e1; /* slate-300 */
+  --bg-color: #0f172a; /* slate-900 */
+}
+
+html, body {
+  color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+.muted {
+  color: var(--muted-text-color);
+}
+
 .dark :root, .dark {
   --bg: #0b1220; /* dark: custom near slate-950 */
   --card: rgba(255,255,255,0.06);
