@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, onDelete }) {
+function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, onDelete, theme = 'light' }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(habit.name);
   const [editDescription, setEditDescription] = useState(habit.description);
@@ -19,7 +19,9 @@ function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, 
 
   return (
     <div
-      className={`p-6 glass neon-border rounded-xl text-slate-100 shadow-xl transition-all duration-300 mb-4 ${
+      className={`p-6 glass neon-border rounded-xl shadow-xl transition-all duration-300 mb-4 ${
+        theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+      } ${
         isCompletedToday ? 'ring-2 ring-emerald-400 animate-celebrate' : ''
       }`}
     >
@@ -30,7 +32,11 @@ function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, 
             type="text"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
-            className="w-full p-3 mb-3 bg-slate-800/60 text-slate-100 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400"
+            className={`w-full p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400 ${
+              theme === 'dark' 
+                ? 'bg-slate-700 text-slate-100 border-slate-600' 
+                : 'bg-slate-100 text-slate-900 border-slate-300'
+            }`}
             required
           />
 
@@ -39,7 +45,11 @@ function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, 
             type="text"
             value={editDescription}
             onChange={(e) => setEditDescription(e.target.value)}
-            className="w-full p-3 mb-3 bg-slate-800/60 text-slate-100 border border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400"
+            className={`w-full p-3 mb-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400 ${
+              theme === 'dark' 
+                ? 'bg-slate-700 text-slate-100 border-slate-600' 
+                : 'bg-slate-100 text-slate-900 border-slate-300'
+            }`}
             placeholder="Description"
           />
 
@@ -71,7 +81,7 @@ function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, 
                 className={`w-12 h-12 rounded-full border-2 flex items-center justify-center text-2xl transition-all duration-300 mr-4 ${
                   isCompletedToday
                     ? 'bg-emerald-500 border-emerald-500 text-white scale-110 shadow-lg'
-                    : 'border-slate-600 text-slate-300 hover:border-sky-400 hover:scale-105'
+                    : `border-${theme === 'dark' ? 'slate-600' : 'slate-400'} ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'} hover:border-sky-400 hover:scale-105`
                 }`}
               >
                 {isCompletedToday ? '✓' : habit.icon || '○'}
@@ -82,8 +92,8 @@ function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, 
                 <h3
                   className={`text-lg font-semibold ${
                     isCompletedToday
-                      ? 'line-through text-slate-500'
-                      : 'text-slate-200'
+                      ? `${theme === 'dark' ? 'line-through text-slate-500' : 'line-through text-slate-500'}`
+                      : `${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`
                   }`}
                 >
                   {habit.name}
@@ -92,7 +102,9 @@ function HabitItem({ habit, isCompletedToday, streak, onToggleComplete, onEdit, 
                 {habit.description && (
                   <p
                     className={`text-sm ${
-                      isCompletedToday ? 'text-slate-500' : 'text-slate-400'
+                      isCompletedToday 
+                        ? 'text-slate-500' 
+                        : `${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`
                     }`}
                   >
                     {habit.description}

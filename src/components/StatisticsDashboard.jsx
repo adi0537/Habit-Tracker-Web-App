@@ -1,7 +1,7 @@
 // StatisticsBoard.jsx
 import React from "react";
 
-function StatisticsDashboard({ habits, completions }) {
+function StatisticsDashboard({ habits, completions, theme = 'light' }) {
   const today = new Date();
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
@@ -154,56 +154,72 @@ function StatisticsDashboard({ habits, completions }) {
   // UI — DARK GLASS THEME
   // -----------------------------
   return (
-    <div className="glass neon-border p-6 shadow-xl animate-fade-in-up text-slate-100">
+    <div className={`glass neon-border p-6 shadow-xl animate-fade-in-up ${
+      theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+    }`}>
       <div className="flex items-center mb-6">
         <div className="text-2xl mr-3">📊</div>
-        <h2 className="text-2xl font-semibold text-slate-200">Statistics Dashboard</h2>
+        <h2 className={`text-2xl font-semibold ${
+          theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+        }`}>Statistics Dashboard</h2>
       </div>
 
       {/* METRICS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
-        <div className="glass neon-border p-4 text-center text-slate-100">
-          <div className="text-3xl font-bold text-sky-300">{totalHabits}</div>
-          <div className="text-sm text-slate-300">Total Habits</div>
+        <div className={`glass neon-border p-4 text-center ${
+          theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+        }`}>
+          <div className="text-3xl font-bold text-sky-400">{totalHabits}</div>
+          <div className={`text-sm ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>Total Habits</div>
         </div>
 
-        <div className="glass neon-border p-4 text-center text-slate-100">
-          <div className="text-3xl font-bold text-emerald-300">{activeHabits}</div>
-          <div className="text-sm text-slate-300">Active Habits</div>
+        <div className={`glass neon-border p-4 text-center ${
+          theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+        }`}>
+          <div className="text-3xl font-bold text-emerald-400">{activeHabits}</div>
+          <div className={`text-sm ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>Active Habits</div>
         </div>
 
-        <div className="glass neon-border p-4 text-center text-slate-100">
-          <div className="text-3xl font-bold text-orange-300">{longestCurrentStreak}</div>
-          <div className="text-sm text-slate-300">Longest Streak</div>
+        <div className={`glass neon-border p-4 text-center ${
+          theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+        }`}>
+          <div className="text-3xl font-bold text-orange-400">{longestCurrentStreak}</div>
+          <div className={`text-sm ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>Longest Streak</div>
         </div>
 
-        <div className="glass neon-border p-4 text-center text-slate-100">
-          <div className="text-3xl font-bold text-purple-300">{monthlyRate}%</div>
-          <div className="text-sm text-slate-300">Monthly Avg</div>
+        <div className={`glass neon-border p-4 text-center ${
+          theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+        }`}>
+          <div className="text-3xl font-bold text-purple-400">{monthlyRate}%</div>
+          <div className={`text-sm ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>Monthly Avg</div>
         </div>
       </div>
 
       {/* TOP HABITS */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-slate-200 mb-3">🏆 Top Performing Habits</h3>
+        <h3 className={`text-lg font-semibold mb-3 ${
+          theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+        }`}>🏆 Top Performing Habits</h3>
 
         <div className="space-y-3">
           {topHabits.map((h) => (
             <div key={h.id}
-              className="glass neon-border p-3 flex items-center justify-between hover:scale-[1.02] transition">
+              className={`glass neon-border p-3 flex items-center justify-between hover:scale-[1.02] transition ${
+                theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+              }`}>
 
               <div className="flex items-center">
                 <div className="text-xl mr-3">{h.icon || "🔥"}</div>
                 <div>
-                  <div className="font-medium text-slate-200">{h.name}</div>
-                  <div className="text-sm text-slate-400">{h.completionCount} completions</div>
+                  <div className={`font-medium ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>{h.name}</div>
+                  <div className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>{h.completionCount} completions</div>
                 </div>
               </div>
 
               <div className="text-right">
                 <div className="text-lg font-bold text-emerald-300">{h.completionRate}%</div>
-                <div className="text-xs text-slate-500">completion rate</div>
+                <div className={`text-xs ${theme === 'dark' ? 'text-slate-500' : 'text-slate-600'}`}>completion rate</div>
               </div>
             </div>
           ))}
@@ -212,9 +228,13 @@ function StatisticsDashboard({ habits, completions }) {
 
       {/* LAST 14-DAY CHART (rolling window) */}
       <div>
-        <h3 className="text-lg font-semibold text-slate-200 mb-3">📈 Recent Progress (last 14 days)</h3>
+        <h3 className={`text-lg font-semibold mb-3 ${
+          theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+        }`}>📈 Recent Progress (last 14 days)</h3>
 
-        <div className="glass neon-border p-4">
+        <div className={`glass neon-border p-4 ${
+          theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+        }`}>
           <div className="flex items-end space-x-1 h-20">
 
             {last14Completions.map((c, idx, arr) => {
@@ -236,7 +256,7 @@ function StatisticsDashboard({ habits, completions }) {
                     style={{ height: `${Math.max(height, 6)}%` }}
                   />
 
-                  <div className={`text-xs mt-1 ${isToday ? "text-emerald-300" : "text-slate-500"}`}>
+                  <div className={`text-base font-bold mt-2 px-3 py-2 rounded-md w-12 h-12 flex items-center justify-center ${isToday ? "bg-emerald-400/30 text-emerald-400" : theme === 'dark' ? "bg-slate-700 text-slate-200" : "bg-slate-200 text-slate-900"}`}>
                     {dayNumber}
                   </div>
                 </div>
@@ -245,8 +265,8 @@ function StatisticsDashboard({ habits, completions }) {
 
           </div>
 
-          <div className="text-center text-sm text-slate-400 mt-2">
-            Last 14 days • {last14Rate}% average completion rate
+          <div className={`text-center text-base font-semibold mt-3 ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>
+            Last 14 days • <span className="text-lg font-bold text-cyan-400">{last14Rate}%</span> average completion rate
           </div>
         </div>
       </div>

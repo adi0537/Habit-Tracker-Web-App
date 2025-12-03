@@ -1,4 +1,4 @@
-function DataExport({ habits, completions }) {
+function DataExport({ habits, completions, theme = 'light' }) {
   const exportData = () => {
     const data = {
       habits,
@@ -50,10 +50,14 @@ function DataExport({ habits, completions }) {
   };
 
   return (
-    <div className="mb-6 p-6 glass neon-border shadow-xl text-slate-100">
+    <div className={`mb-6 p-6 glass neon-border shadow-xl ${
+      theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+    }`}>
       <div className="flex items-center mb-6">
         <div className="text-2xl mr-3">💾</div>
-        <h2 className="text-2xl font-semibold text-slate-200">Data Management</h2>
+        <h2 className={`text-2xl font-semibold ${
+          theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+        }`}>Data Management</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -66,7 +70,7 @@ function DataExport({ habits, completions }) {
           >
             📤 Export Data
           </button>
-          <p className="text-sm text-slate-400 mt-2">
+          <p className={`text-sm mt-2 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
             Download your data as a JSON file
           </p>
         </div>
@@ -82,7 +86,7 @@ function DataExport({ habits, completions }) {
               className="hidden"
             />
           </label>
-          <p className="text-sm text-slate-400 mt-2">
+          <p className={`text-sm mt-2 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
             Upload a backup JSON file
           </p>
         </div>
@@ -95,16 +99,18 @@ function DataExport({ habits, completions }) {
           >
             🗑️ Clear All Data
           </button>
-          <p className="text-sm text-slate-400 mt-2">
+          <p className={`text-sm mt-2 ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
             Permanently remove all data
           </p>
         </div>
       </div>
 
       {/* Tips Card */}
-      <div className="mt-6 p-4 glass neon-border rounded-lg">
-        <h3 className="font-semibold text-sky-300 mb-2">💡 Data Tips</h3>
-        <ul className="text-sm text-slate-300 space-y-1">
+      <div className={`mt-6 p-4 glass neon-border rounded-lg ${
+        theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+      }`}>
+        <h3 className={`font-semibold mb-2 ${theme === 'dark' ? 'text-sky-300' : 'text-sky-600'}`}>💡 Data Tips</h3>
+        <ul className={`text-sm space-y-1 ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>
           <li>• Export backups regularly</li>
           <li>• Import merges with existing data</li>
           <li>• Clearing data cannot be undone</li>

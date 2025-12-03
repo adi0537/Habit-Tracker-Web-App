@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 
-function CalendarView({ completions, habits }) {
+function CalendarView({ completions, habits, theme = 'light' }) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const localDateKey = (date = new Date()) => {
@@ -80,18 +80,26 @@ function CalendarView({ completions, habits }) {
   ];
 
   return (
-    <div className="mb-6 p-6 glass neon-border shadow-xl text-slate-100">
+    <div className={`mb-6 p-6 glass neon-border shadow-xl ${
+      theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+    }`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
           <div className="text-2xl mr-3">📅</div>
-          <h2 className="text-2xl font-semibold text-slate-200">Calendar View</h2>
+          <h2 className={`text-2xl font-semibold ${
+            theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+          }`}>Calendar View</h2>
         </div>
 
         <div className="flex items-center space-x-2">
           <button
             onClick={() => navigateMonth(-1)}
-            className="p-2 rounded-lg hover:bg-slate-700/40 text-slate-300"
+            className={`p-2 rounded-lg ${
+              theme === 'dark' 
+                ? 'hover:bg-slate-700/40 text-slate-300' 
+                : 'hover:bg-slate-200/40 text-slate-600'
+            }`}
           >
             ←
           </button>
@@ -105,7 +113,11 @@ function CalendarView({ completions, habits }) {
 
           <button
             onClick={() => navigateMonth(1)}
-            className="p-2 rounded-lg hover:bg-slate-700/40 text-slate-300"
+            className={`p-2 rounded-lg ${
+              theme === 'dark' 
+                ? 'hover:bg-slate-700/40 text-slate-300' 
+                : 'hover:bg-slate-200/40 text-slate-600'
+            }`}
           >
             →
           </button>
@@ -114,7 +126,9 @@ function CalendarView({ completions, habits }) {
 
       {/* Month Title */}
       <div className="mb-4 text-center">
-        <h3 className="text-xl font-semibold text-slate-200">
+        <h3 className={`text-xl font-semibold ${
+          theme === 'dark' ? 'text-slate-100' : 'text-slate-900'
+        }`}>
           {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
         </h3>
       </div>
@@ -122,7 +136,9 @@ function CalendarView({ completions, habits }) {
       {/* Day Names */}
       <div className="grid grid-cols-7 gap-1 mb-2">
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-          <div key={d} className="p-2 text-center text-sm font-medium text-slate-400">
+          <div key={d} className={`p-2 text-center text-sm font-medium ${
+            theme === 'dark' ? 'text-slate-400' : 'text-slate-600'
+          }`}>
             {d}
           </div>
         ))}
@@ -139,14 +155,18 @@ function CalendarView({ completions, habits }) {
             <div
               key={idx}
               className={`aspect-square flex items-center justify-center rounded-lg relative ${
-                date ? "hover:bg-slate-700/40 cursor-pointer" : ""
+                date ? `${theme === 'dark' ? 'hover:bg-slate-700/40' : 'hover:bg-slate-200/40'} cursor-pointer` : ""
               }`}
             >
               {date && (
                 <>
                   <span
                     className={`font-medium ${
-                      isToday ? "text-sky-400" : "text-slate-200"
+                      isToday 
+                        ? "text-sky-400" 
+                        : theme === 'dark' 
+                          ? 'text-slate-200' 
+                          : 'text-slate-900'
                     }`}
                   >
                     {date.getDate()}
@@ -175,7 +195,9 @@ function CalendarView({ completions, habits }) {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center space-x-6 text-sm mt-4 text-slate-300">
+      <div className={`flex items-center justify-center space-x-6 text-sm mt-4 ${
+        theme === 'dark' ? 'text-slate-300' : 'text-slate-600'
+      }`}>
         <div className="flex items-center">
           <div className="w-3 h-3 bg-emerald-400 rounded-full mr-2"></div>
           <span>All habits completed</span>

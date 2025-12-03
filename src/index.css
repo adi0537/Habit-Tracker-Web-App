@@ -1,12 +1,28 @@
 @import "tailwindcss";
 
 /* ---------------------------
-   Base Global Dark Theme
----------------------------- */
+   Sleek Light/Dark Foundations
+----------------------------- */
+
+:root {
+  --bg: #f8fafc; /* light: slate-50 */
+  --card: #ffffff; /* light: white */
+  --text: #0f172a; /* light: slate-900 */
+  --muted: #475569; /* light: slate-600 */
+  --border: #e2e8f0; /* light: slate-200 */
+}
+
+.dark :root, .dark {
+  --bg: #0b1220; /* dark: custom near slate-950 */
+  --card: rgba(255,255,255,0.06);
+  --text: #e2e8f0; /* slate-200 */
+  --muted: #94a3b8; /* slate-400 */
+  --border: rgba(255,255,255,0.14);
+}
 
 html, body {
-  background: #0f172a; /* slate-900 */
-  color: #e2e8f0;       /* slate-200 */
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -15,9 +31,11 @@ html, body {
 /* Smooth transitions */
 * {
   transition:
-    background-color 0.25s ease,
-    color 0.25s ease,
-    border-color 0.25s ease;
+    background-color 0.22s ease,
+    color 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.12s ease;
 }
 
 /* ---------------------------
@@ -25,46 +43,36 @@ html, body {
 ---------------------------- */
 
 .glass {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--card);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid var(--border);
   border-radius: 1rem;
 }
 
 .glass-hover:hover {
-  background: rgba(255, 255, 255, 0.10);
-  border-color: rgba(255, 255, 255, 0.20);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
 }
 
 /* Neon Accent Border */
 .neon-border {
-  border: 1px solid rgba(56, 189, 248, 0.4); /* sky-400 glow */
+  border: 1px solid rgba(20, 184, 166, 0.6); /* teal-500 slightly stronger */
   box-shadow:
-    0 0 6px rgba(56, 189, 248, 0.4),
-    0 0 20px rgba(129, 140, 248, 0.3);
+    0 0 6px rgba(45, 212, 191, 0.65), /* teal-400 glow, less white */
+    0 0 22px rgba(2, 132, 199, 0.45), /* sky-600 outer glow */
+    inset 0 0 6px rgba(226, 252, 245, 0.35); /* teal-100 inner tint, less white than -50 */
 }
 
 /* ---------------------------
-   Custom Scrollbars (Dark)
----------------------------- */
+   Custom Scrollbars (Adaptive)
+----------------------------- */
 
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #020617; /* slate-950 */
-}
-
-::-webkit-scrollbar-thumb {
-  background: #334155; /* slate-700 */
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #475569; /* slate-600 */
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+.dark ::-webkit-scrollbar-track { background: #0b1220; }
 
 /* ---------------------------
    Keyframes (from your file)
@@ -92,28 +100,14 @@ html, body {
 .animate-pulse-gentle { animation: pulse 2s infinite; }
 .animate-celebrate { animation: celebrate 0.8s ease-in-out; }
 
-/* RESET OLD LIGHT COLORS TO DARK THEME COLORS */
-.text-gray-800, .text-black {
-  color: #f1f5f9 !important; /* slate-100 */
+/* Sharper defaults and adaptive utilities */
+.card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
 }
 
-.text-gray-700 {
-  color: #e2e8f0 !important; /* slate-200 */
-}
-
-.text-gray-600 {
-  color: #cbd5e1 !important; /* slate-300 */
-}
-
-.bg-white, .bg-gray-50, .bg-gray-100 {
-  background-color: rgba(255, 255, 255, 0.06) !important;
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.12);
-}
-
-.border-gray-100 {
-  border-color: rgba(255,255,255,0.18) !important;
-}
+.muted { color: var(--muted); }
 /* Make all text sharper */
 html, body {
   -webkit-font-smoothing: antialiased;
@@ -123,5 +117,12 @@ html, body {
 .text-sharp {
   text-shadow: 0 0 1px rgba(255,255,255,0.15);
 }
+
+/* Focus ring */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.4);
+}
+
 
 

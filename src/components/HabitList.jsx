@@ -2,7 +2,7 @@ import HabitItem from './HabitItem';
 import React from 'react';
 
 // Robust HabitList with universal completion parsing + debug output
-function HabitList({ habits, completions, onToggleComplete, onEditHabit, onDeleteHabit }) {
+function HabitList({ habits, completions, onToggleComplete, onEditHabit, onDeleteHabit, theme = 'light' }) {
 
   // Normalize any date-like input to local YYYY-MM-DD
   const toLocalDateKey = (dateLike) => {
@@ -166,18 +166,18 @@ function HabitList({ habits, completions, onToggleComplete, onEditHabit, onDelet
   const longestStreak = habits.length > 0 ? Math.max(...habits.map(habit => getStreak(habit.id))) : 0;
 
   return (
-    <div className="mb-6 glass neon-border p-6 text-slate-100">
+    <div className={`mb-6 glass neon-border p-6 ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
           <div className="text-2xl mr-3">📋</div>
-          <h2 className="text-2xl font-semibold text-slate-200">Your Habits</h2>
+          <h2 className={`text-2xl font-semibold ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>Your Habits</h2>
         </div>
 
         {habits.length > 0 && (
           <div className="text-right">
-            <div className="text-sm text-slate-400">Total Streaks</div>
+            <div className={`text-sm ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>Total Streaks</div>
             <div className="text-lg font-bold text-orange-400">{totalStreaks} 🔥</div>
-            <div className="text-xs text-slate-500">Longest: {longestStreak} days</div>
+            <div className={`text-xs ${theme === 'dark' ? 'text-slate-500' : 'text-slate-500'}`}>Longest: {longestStreak} days</div>
           </div>
         )}
       </div>
@@ -185,8 +185,8 @@ function HabitList({ habits, completions, onToggleComplete, onEditHabit, onDelet
       {habits.length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4 opacity-50">🎯</div>
-          <h3 className="text-xl font-semibold text-slate-200 mb-2">No habits yet</h3>
-          <p className="text-slate-400">Add your first habit above to get started!</p>
+          <h3 className={`text-xl font-semibold mb-2 ${theme === 'dark' ? 'text-slate-100' : 'text-slate-900'}`}>No habits yet</h3>
+          <p className={theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}>Add your first habit above to get started!</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -199,6 +199,7 @@ function HabitList({ habits, completions, onToggleComplete, onEditHabit, onDelet
               onToggleComplete={onToggleComplete}
               onEdit={onEditHabit}
               onDelete={onDeleteHabit}
+              theme={theme}
             />
           ))}
         </div>

@@ -25,10 +25,21 @@ function toLocalDateKey(d = new Date()) {
 }
 
 function App() {
-  // FORCE DARK MODE ONCE
+  // Theme state with persistence
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light' || saved === 'dark') return saved;
+    // prefer system
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? 'dark' : 'light';
+  });
+
   useEffect(() => {
-    document.body.classList.add('dark');
-  }, []);
+    const root = document.documentElement;
+    if (theme === 'dark') root.classList.add('dark');
+    else root.classList.remove('dark');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const [habits, setHabits] = useApi('habits', []);
   const [completions, setCompletions] = useApi('completions', {});
@@ -108,19 +119,37 @@ function App() {
     { id: 'data', label: 'Data', icon: '💾' },
   ];
 
+  const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'));
+
   return (
-    <div className="min-h-screen bg-slate-900 py-8 text-slate-200">
+    <div className={`min-h-screen py-2 ${theme === 'dark' ? 'bg-slate-900 text-slate-200' : 'bg-slate-50 text-slate-900'}`}>
       <div className="container mx-auto px-4 max-w-4xl">
-        {/* Title */}
-        <div className="text-center mb-8 animate-fade-in-up">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-sky-400 to-purple-400 bg-clip-text text-transparent mb-2">
+        {/* Theme toggle - first div */}
+        <div className="flex justify-end mb-2 animate-fade-in-up">
+          <button
+            onClick={toggleTheme}
+            className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg border transition card ${
+              theme === 'dark' ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+            }`}
+            aria-label="Toggle theme"
+          >
+            <span className="text-lg">{theme === 'dark' ? '🌙' : '☀️'}</span>
+            <span className="text-xs font-medium hidden sm:inline">{theme === 'dark' ? 'Dark' : 'Light'}</span>
+          </button>
+        </div>
+
+        {/* Heading - second div */}
+        <div className="mb-8 animate-fade-in-up text-center">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-teal-300 via-teal-500 to-sky-600 bg-clip-text text-transparent mb-1">
             🌟 HabitFlow
           </h1>
-          <p className="text-slate-300 text-lg">{getMotivationalMessage()}</p>
+          <p className="text-sm muted">{getMotivationalMessage()}</p>
         </div>
 
         {/* TABS */}
-        <div className="glass neon-border rounded-xl p-2 mb-6">
+        <div className={`glass neon-border rounded-xl p-2 mb-6 ${
+          theme === 'dark' ? 'bg-slate-800' : 'bg-slate-100'
+        }`}>
           <div className="flex space-x-1">
             {tabs.map((tab) => (
               <button
@@ -128,8 +157,10 @@ function App() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-sky-500 to-purple-600 text-white shadow-md scale-105'
-                    : 'text-slate-300 hover:bg-slate-700/40'
+                    ? 'bg-gradient-to-r from-teal-300 via-teal-600 to-sky-600 text-white shadow-md scale-105'
+                    : theme === 'dark'
+                      ? 'text-slate-300 hover:bg-slate-700/40'
+                      : 'text-slate-600 hover:bg-slate-200/60'
                 }`}
               >
                 <span className="mr-2">{tab.icon}</span>
@@ -143,33 +174,34 @@ function App() {
         <div className="animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
           {activeTab === 'habits' && (
             <>
-              <AddHabitForm onAddHabit={addHabit} />
-              <ProgressBar completed={completedToday} total={habits.length} />
+              <AddHabitForm onAddHabit={addHabit} theme={theme} />
+              <ProgressBar completed={completedToday} total={habits.length} theme={theme} />
               <HabitList
                 habits={habits}
                 completions={completions}
                 onToggleComplete={toggleComplete}
                 onEditHabit={editHabit}
                 onDeleteHabit={deleteHabit}
+                theme={theme}
               />
             </>
           )}
 
-          {activeTab === 'calendar' && <CalendarView habits={habits} completions={completions} />}
+          {activeTab === 'calendar' && <CalendarView habits={habits} completions={completions} theme={theme} />}
 
           {activeTab === 'statistics' && (
-            <StatisticsDashboard habits={habits} completions={completions} />
+            <StatisticsDashboard habits={habits} completions={completions} theme={theme} />
           )}
 
-          {activeTab === 'data' && <DataExport habits={habits} completions={completions} />}
+          {activeTab === 'data' && <DataExport habits={habits} completions={completions} theme={theme} />}
         </div>
 
         {/* Empty State */}
         {habits.length === 0 && activeTab === 'habits' && (
           <div className="text-center mt-12 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             <div className="text-6xl mb-4 animate-pulse-gentle">🎯</div>
-            <h3 className="text-xl font-semibold text-slate-200 mb-2">Ready to build better habits?</h3>
-            <p className="text-slate-400">Start by adding your first habit above!</p>
+            <h3 className="text-xl font-semibold mb-2">Ready to build better habits?</h3>
+            <p className="muted">Start by adding your first habit above!</p>
           </div>
         )}
       </div>

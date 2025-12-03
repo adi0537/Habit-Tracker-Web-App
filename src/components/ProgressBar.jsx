@@ -131,7 +131,7 @@ function computeRollingTotalBased(completionsInput, daysToAverage = 14) {
   };
 }
 
-function ProgressBar({ completed, total, completions, daysToAverage = 14, style }) {
+function ProgressBar({ completed, total, completions, daysToAverage = 14, style, theme = 'light' }) {
   const [animatedPercentage, setAnimatedPercentage] = useState(0);
 
   // If completions provided -> compute rolling average; otherwise fall back to original completed/total
@@ -173,20 +173,26 @@ function ProgressBar({ completed, total, completions, daysToAverage = 14, style 
   const titleText = completions ? `Average completion (last ${daysToAverage} days)` : `Today's Progress`;
 
   return (
-    <div className="mb-6 p-6 bg-white rounded-xl shadow-lg border border-gray-100" style={style}>
+    <div className={`mb-6 p-6 rounded-xl shadow-lg border ${
+      theme === 'dark' 
+        ? 'bg-slate-800 border-slate-700' 
+        : 'bg-white border-gray-100'
+    }`} style={style}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <div className="text-2xl mr-3" aria-hidden>📊</div>
-          <h2 className="text-xl font-semibold text-gray-800">{titleText}</h2>
+          <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-slate-200' : 'text-gray-800'}`}>{titleText}</h2>
         </div>
 
-        <div className="text-2xl font-bold text-gray-800" aria-live="polite">
+        <div className={`text-2xl font-bold ${theme === 'dark' ? 'text-slate-200' : 'text-gray-800'}`} aria-live="polite">
           {percentage}%
         </div>
       </div>
 
       <div
-        className="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner"
+        className={`w-full rounded-full h-6 overflow-hidden shadow-inner ${
+          theme === 'dark' ? 'bg-slate-700' : 'bg-gray-200'
+        }`}
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
@@ -201,7 +207,7 @@ function ProgressBar({ completed, total, completions, daysToAverage = 14, style 
       </div>
 
       <div className="flex justify-between items-center mt-3">
-        <p className="text-gray-600">
+        <p className={theme === 'dark' ? 'text-slate-400' : 'text-gray-600'}>
           <span className="font-semibold text-green-600">{safeCompleted}</span> of{' '}
           <span className="font-semibold text-blue-600">{safeTotal}</span> habits completed
         </p>
