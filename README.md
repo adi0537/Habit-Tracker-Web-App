@@ -6,9 +6,6 @@ A beautiful, modern web application to track your daily habits with gamification
 
 - [✨ Features](#-features)
 - [🛠️ Tech Stack](#️-tech-stack)
-- [🚀 Quick Start](#-quick-start)
-- [📚 Documentation](#-documentation)
-- [🌐 Deployment](#-deployment)
 - [🎮 Usage](#-usage)
 - [📈 Gamification Features](#-gamification-features)
 - [🏗️ Project Structure](#️-project-structure)
@@ -41,6 +38,7 @@ A beautiful, modern web application to track your daily habits with gamification
 - **Language**: JavaScript (ES6+)
 - **Icons**: Unicode emojis for cross-platform compatibility
 
+## ✨ Usage
 The app features four main sections accessible via the navigation tabs at the top:
 
 ### 🎯 Habits Tab
