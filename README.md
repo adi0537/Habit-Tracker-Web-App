@@ -38,7 +38,7 @@ A beautiful, modern web application to track your daily habits with gamification
 - **Language**: JavaScript (ES6+)
 - **Icons**: Unicode emojis for cross-platform compatibility
 
-## ✨ Usage
+## Usage
 The app features four main sections accessible via the navigation tabs at the top:
 
 ### 🎯 Habits Tab
