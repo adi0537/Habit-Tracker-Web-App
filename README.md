@@ -2,10 +2,6 @@
 
 A beautiful, modern web application to track your daily habits with gamification elements, built with React and Vite. All data is stored locally in your browser using localStorage, ensuring privacy and offline functionality.
 
-🌐 **[Live Demo](https://theunknown550.github.io/Habit-Tracker-Web-App/)** - Try it now!
-
-![Habit Tracker Demo](./demo.gif) <!-- Placeholder for demo GIF -->
-
 ## 📋 Table of Contents
 
 - [✨ Features](#-features)
@@ -40,61 +36,10 @@ A beautiful, modern web application to track your daily habits with gamification
 
 - **Frontend**: React 19.1.1 with Vite for fast development and building
 - **Styling**: TailwindCSS 4.1.14 for modern, utility-first CSS with custom animations
-- **Data Storage**: Browser localStorage (no backend required)
+- **Data Storage**: MongoDB Atlas
+- **Backend**: Node.js
 - **Language**: JavaScript (ES6+)
 - **Icons**: Unicode emojis for cross-platform compatibility
-
-## 🚀 Quick Start
-
-Get started with the Habit Tracker in just a few minutes!
-
-```bash
-git clone https://github.com/TheUnknown550/Habit-Tracker-Web-App.git
-cd Habit-Tracker-Web-App
-npm install
-npm run dev
-```
-
-Then open `http://localhost:5173` in your browser.
-
-📖 **Detailed Installation Guide**: See [INSTALLATION.md](INSTALLATION.md) for comprehensive setup instructions, troubleshooting, and alternative installation methods.
-
-## 📚 Documentation
-
-- **[INSTALLATION.md](INSTALLATION.md)** - Complete installation and setup guide
-- **[README.md](README.md)** - Project overview, features, and usage (this file)
-
-## 🌐 Deployment
-
-This app is automatically deployed to GitHub Pages using GitHub Actions.
-
-**Live Demo**: [https://theunknown550.github.io/Habit-Tracker-Web-App/](https://theunknown550.github.io/Habit-Tracker-Web-App/)
-
-### Automatic Deployment
-
-Every push to the `main` branch triggers an automatic deployment:
-1. GitHub Actions builds the app using `npm run build`
-2. The built files are deployed to GitHub Pages
-3. Your site is live within 2-3 minutes!
-
-### Manual Deployment
-
-You can also trigger a deployment manually:
-1. Go to the **Actions** tab in your GitHub repository
-2. Select the **Deploy to GitHub Pages** workflow
-3. Click **Run workflow**
-
-### Setup GitHub Pages (First Time)
-
-If you fork this repository, enable GitHub Pages:
-1. Go to your repository **Settings**
-2. Navigate to **Pages** (under "Code and automation")
-3. Under **Source**, select **GitHub Actions**
-4. The next push to `main` will deploy automatically!
-
-See [INSTALLATION.md](INSTALLATION.md#deploying-to-github-pages) for more deployment options.
-
-## 🎮 Usage
 
 The app features four main sections accessible via the navigation tabs at the top:
 
@@ -167,7 +112,6 @@ Contributions are welcome! This project is open-source and beginner-friendly. He
 
 ### Ideas for Contributions
 
-- **🌙 Dark Mode**: Toggle between light and dark themes for better user experience
 - **� PWA Features**: Progressive Web App capabilities for mobile installation
 - **🔔 Browser Notifications**: Optional reminders for habit completion times
 - **📊 Advanced Analytics**: Trend analysis, habit correlations, and predictive insights
